@@ -1,5 +1,6 @@
 package br.com.standard.security;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.Date;
 import javax.servlet.http.HttpServletRequest;
@@ -12,17 +13,21 @@ import io.jsonwebtoken.SignatureAlgorithm;
 public class TokenAuthenticationService {
 
 	static final long EXPIRATION_TIME = 860_000_000;
-	static final String SECRET = "MySecret";
+	static final String SECRET = "bc9a50e1e0085b13c4bba866f6dfe57c";
 	static final String TOKEN_PREFIX = "Bearer";
 	static final String HEADER_STRING = "Authorization";
 
-	static void addAuthentication(HttpServletResponse response, String username) {
+	static void addAuthentication(HttpServletResponse response, String username) throws IOException {
 		
 		String JWT = Jwts.builder().setSubject(username)
 				.setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
 				.signWith(SignatureAlgorithm.HS512, SECRET).compact();
 
 		response.addHeader(HEADER_STRING, TOKEN_PREFIX + " " + JWT);
+		
+		response.setContentType("text/plain");
+		
+		response.getWriter().write(JWT);
 	}
 
 	static Authentication getAuthentication(HttpServletRequest request) {
